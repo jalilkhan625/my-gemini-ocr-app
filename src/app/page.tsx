@@ -1,103 +1,141 @@
-import Image from "next/image";
+"use client";
+
+import { useState, ChangeEvent } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [text, setText] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string>("");
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [progress, setProgress] = useState<number>(0);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const handleExtract = async () => {
+    const fileInput = document.getElementById("imageInput") as HTMLInputElement;
+    const file = fileInput.files?.[0];
+    if (!file) {
+      toast.error("Please select an image before extracting text");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    setLoading(true);
+    setText("");
+    setProgress(0);
+
+    // Simulated progress bar animation
+    const interval = setInterval(() => {
+      setProgress((prev) => (prev < 90 ? prev + 10 : prev));
+    }, 300);
+
+    try {
+      const res = await fetch("/api/ocr", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("OCR API request failed");
+
+      const data = await res.json();
+      if (data.text) {
+        setText(data.text);
+        setProgress(100);
+        toast.success("Text extracted successfully!");
+      } else {
+        toast.error("No text found in the image");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error extracting text. Please try again.");
+    } finally {
+      clearInterval(interval);
+      setTimeout(() => {
+        setLoading(false);
+        setProgress(0);
+      }, 800);
+    }
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setFileName(file?.name || "");
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+      //toast.success("Image selected successfully!");
+    } else {
+      setPreviewUrl("");
+    }
+  };
+
+  return (
+    <main className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
+      {/* Toast Container */}
+      <Toaster position="top-right" reverseOrder={false} />
+
+      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          🖼️ Gemini OCR Tool
+        </h1>
+        <p className="text-gray-600 mb-6">
+          Upload an image and extract text instantly using Google Gemini 1.5.
+        </p>
+
+        {/* File Upload */}
+        <label
+          htmlFor="imageInput"
+          className="block w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-center cursor-pointer hover:border-blue-500 transition"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          {fileName || "Click or drag an image here"}
+        </label>
+        <input
+          type="file"
+          id="imageInput"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+
+        {/* Image Preview */}
+        {previewUrl && (
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="mt-4 max-h-64 w-full object-contain rounded-lg border"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        )}
+
+        {/* Progress Bar */}
+        {loading && (
+          <div className="w-full bg-gray-200 rounded-full h-3 mt-4 overflow-hidden">
+            <div
+              className="bg-blue-600 h-3 transition-all duration-200"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+        )}
+
+        {/* Extract Button */}
+        <button
+          onClick={handleExtract}
+          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl mt-4 transition disabled:opacity-50"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          {loading ? "Extracting..." : "Extract Text"}
+        </button>
+
+        {/* Extracted Text */}
+        <h2 className="text-lg font-semibold text-gray-700 mt-6">
+          Extracted Text:
+        </h2>
+        <textarea
+          rows={8}
+          className="w-full p-3 border border-gray-300 rounded-xl mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={text}
+          readOnly
+        ></textarea>
+      </div>
+    </main>
   );
 }

@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Handscribe
 
-## Getting Started
+**Clear and simple: handwriting to text**
 
-First, run the development server:
+Handscribe is a lightweight tool that converts handwritten notes, forms, and documents into editable digital text using advanced OCR powered by Google Gemini.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Author
+👨‍💻 **Jalil Khan**  
+
+If you like my work, **please leave a ⭐ on this repository**.
+
+---
+
+## Features
+- 🖋 Extracts text from handwritten and printed images
+- 📄 Works with notes, forms, and mixed content
+- ⚡ Fast and accurate recognition
+- 🖼 Image preview and progress tracking
+- 🔔 Success, error, and validation toasts
+
+---
+
+## Project Structure
+```
+MY-GEMINI-OCR-APP/
+│
+├── public/                 # Public assets
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── ocr/
+│   │   │       └── route.ts   # API route for OCR processing
+│   │   ├── globals.css        # Global styles
+│   │   ├── layout.tsx         # Layout component
+│   │   ├── page.tsx           # Main page with OCR UI
+│   ├── favicon.ico
+│
+├── .env.local               # Environment variables (API keys, etc.)
+├── package.json
+├── README.md
+└── tsconfig.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How It Works
+1. Upload or drag-and-drop your handwritten image.
+2. The system processes the image using Gemini OCR.
+3. Extracted text is displayed and ready to copy.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Tech Stack
+- **Frontend:** Next.js, React, Tailwind CSS
+- **OCR Engine:** Google Gemini 1.5
+- **Notifications:** react-hot-toast
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Installation
+```bash
+# Clone the repo
+git clone https://github.com/jalilkhan625/handscribe.git
+cd handscribe
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Install dependencies
+npm install
 
-## Deploy on Vercel
+# Run the development server
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Usage
+- Select an image file containing handwriting.
+- Click **Extract Text**.
+- View and copy your extracted text.
+
+---
+
+## License
+MIT License
